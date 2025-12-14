@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day Progress Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="time"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="time"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .progress-container {
+            margin: 30px 0;
+        }
+
+        .progress-bar-bg {
+            background: #f0f0f0;
+            border-radius: 20px;
+            height: 40px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 60px;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .remaining-text {
+            position: absolute;
+            right: 15px;
+            color: #888;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 1;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .time-display {
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .current-time {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏰ Day Progress Tracker</h1>
+        
+        <div class="input-group">
+            <label for="wakeTime">Wake Time</label>
+            <input type="time" id="wakeTime" value="08:00">
+        </div>
+
+        <div class="input-group">
+            <label for="sleepTime">Sleep Time</label>
+            <input type="time" id="sleepTime" value="00:00">
+        </div>
+
+        <div class="current-time" id="currentTime">Current time: --:--</div>
+
+        <div class="time-display" id="percentDisplay">--%</div>
+
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar" id="progressBar">0%</div>
+                <div class="remaining-text" id="remainingPercent">100%</div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Time Elapsed</div>
+                <div class="stat-value" id="elapsed">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Time Remaining</div>
+                <div class="stat-value" id="remaining">--</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function parseTimeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function formatHours(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            if (hours === 0) {
+                return `${mins}m`;
+            }
+            return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+
+        function calculateProgress() {
+            const wakeTime = document.getElementById('wakeTime').value;
+            const sleepTime = document.getElementById('sleepTime').value;
+            
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            let wakeMinutes = parseTimeToMinutes(wakeTime);
+            let sleepMinutes = parseTimeToMinutes(sleepTime);
+            
+            // Handle midnight crossing
+            if (sleepMinutes <= wakeMinutes) {
+                sleepMinutes += 24 * 60; // Add 24 hours
+            }
+            
+            const totalWakingMinutes = sleepMinutes - wakeMinutes;
+            
+            let elapsed;
+            if (currentMinutes >= wakeMinutes) {
+                elapsed = currentMinutes - wakeMinutes;
+            } else {
+                // Before wake time (still in previous day's cycle)
+                elapsed = (24 * 60 - wakeMinutes) + currentMinutes;
+            }
+            
+            // Cap elapsed at total waking minutes
+            if (elapsed > totalWakingMinutes) {
+                elapsed = totalWakingMinutes;
+            }
+            
+            const percentage = Math.min((elapsed / totalWakingMinutes) * 100, 100);
+            const remaining = Math.max(totalWakingMinutes - elapsed, 0);
+            const remainingPercent = Math.max(100 - percentage, 0);
+            
+            // Update display
+            document.getElementById('currentTime').textContent = `Current time: ${formatTime(now)}`;
+            document.getElementById('percentDisplay').textContent = `${percentage.toFixed(1)}%`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('progressBar').textContent = `${percentage.toFixed(1)}%`;
+            document.getElementById('remainingPercent').textContent = `${remainingPercent.toFixed(1)}%`;
+            document.getElementById('elapsed').textContent = formatHours(elapsed);
+            document.getElementById('remaining').textContent = formatHours(remaining);
+        }
+
+        // Update every second
+        setInterval(calculateProgress, 1000);
+        
+        // Update when inputs change
+        document.getElementById('wakeTime').addEventListener('change', calculateProgress);
+        document.getElementById('sleepTime').addEventListener('change', calculateProgress);
+        
+        // Initial calculation
+        calculateProgress();
+    </script>
+</body>
+</html>
