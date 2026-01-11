@@ -3,606 +3,538 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day Progress Calculator</title>
+    <title>Happy Birthday! 🎆</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
         }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 100%;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-            display: none; /* Hide the time inputs, we'll use the interactive ring */
-        }
-
-        label {
+        
+        canvas {
             display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-            font-size: 14px;
+            background: #000;
         }
-
-        input[type="time"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="time"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .progress-container {
-            margin: 30px 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .clock-container {
-            position: relative;
-            width: 350px;
-            height: 350px;
-        }
-
-        .clock-svg {
-            transform: rotate(-90deg);
-            width: 100%;
-            height: 100%;
-        }
-
-        .outer-circle {
-            fill: none;
-            stroke: #e8e8e8;
-            stroke-width: 2;
-        }
-
-        .clock-circle-bg {
-            fill: none;
-            stroke: #f0f0f0;
-            stroke-width: 20;
-        }
-
-        .clock-circle-progress {
-            fill: none;
-            stroke: url(#gradient);
-            stroke-width: 20;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.5s ease;
-        }
-
-        .clock-center {
-            position: absolute;
+        
+        .test-button {
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        .clock-percentage {
-            font-size: 48px;
-            font-weight: bold;
-            color: #667eea;
-            line-height: 1;
-        }
-
-        .clock-label {
-            font-size: 14px;
-            color: #888;
-            margin-top: 8px;
-        }
-
-        .clock-remaining {
-            font-size: 24px;
-            font-weight: bold;
-            color: #999;
-            margin-top: 12px;
-        }
-
-        .clock-markers {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
-
-        .time-marker {
-            position: absolute;
-            font-size: 13px;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #4a9ff5 50%, #00d4ff 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 16px;
             font-weight: 600;
-            color: #999;
-            transform: translate(-50%, -50%);
-            user-select: none;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6),
+                        0 0 20px rgba(74, 159, 245, 0.4);
+            transition: all 0.4s ease;
+            z-index: 1000;
+            letter-spacing: 0.5px;
         }
-
-        .time-handle {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: grab;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            transition: transform 0.2s;
+        
+        .test-button:hover {
+            background: linear-gradient(135deg, #8a9fff 0%, #6fc5ff 50%, #3df5ff 100%);
+            box-shadow: 0 8px 35px rgba(138, 159, 255, 0.9),
+                        0 0 50px rgba(111, 197, 255, 0.7),
+                        inset 0 0 30px rgba(255, 255, 255, 0.3);
         }
-
-        .time-handle:active {
-            cursor: grabbing;
-            transform: translate(-50%, -50%) scale(1.2);
+        
+        .test-button:active {
+            transform: translate(-50%, -50%) scale(0.98);
         }
-
-        .wake-handle {
-            background: #4ade80;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(74, 222, 128, 0.4);
-        }
-
-        .sleep-handle {
-            background: #f97316;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
-        }
-
-        .handle-label {
-            position: absolute;
-            top: -30px;
+        
+        .success-message {
+            position: fixed;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
             font-weight: bold;
-            white-space: nowrap;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        .wake-handle .handle-label {
-            color: #4ade80;
-        }
-
-        .sleep-handle .handle-label {
-            color: #f97316;
-        }
-
-        .time-legend {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .legend-time-input {
-            padding: 4px 8px;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 14px;
-            width: 90px;
+            color: white;
             text-align: center;
-            transition: border-color 0.2s;
+            z-index: 1000;
+            text-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.6),
+                0 0 30px rgba(255, 255, 255, 0.4),
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                0 8px 16px rgba(0, 0, 0, 0.6);
+            display: none;
         }
-
-        .legend-time-input:hover {
-            border-color: #667eea;
+        
+        .success-message.show {
+            display: block;
+            animation: zoomIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-
-        .legend-time-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
-
-        .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
+        
+        .puja-thali {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: auto;
+            z-index: 1000;
+            display: none;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8))
+                    drop-shadow(0 0 50px rgba(255, 165, 0, 0.6));
         }
-
-        .legend-dot.wake {
-            background: #4ade80;
+        
+        .puja-thali.show {
+            display: block;
+            animation: zoomInImage 1s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-
-        .legend-dot.sleep {
-            background: #f97316;
+        
+        .puja-thali.rotate {
+            display: block;
+            animation: circularMotion 15s linear forwards;
         }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 30px;
+        
+        .puja-thali.aligned {
+            display: block;
+            transform: translate(-50%, calc(-50% - 100px));
+            animation: moveToTop 0.5s ease-out forwards;
         }
-
-        .stat-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
+        
+        @keyframes moveToTop {
+            from {
+                transform: translate(-50%, -50%);
+            }
+            to {
+                transform: translate(-50%, calc(-50% - 100px));
+            }
         }
-
-        .stat-label {
-            font-size: 12px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+        
+        @keyframes zoomInImage {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
+        
+        @keyframes circularMotion {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg) translateX(150px) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(1080deg) translateX(150px) rotate(-1080deg);
+            }
         }
-
-        .time-display {
-            text-align: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: #667eea;
-            margin: 20px 0;
+        
+        .cake-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-50% + 200px));
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffa07a 50%, #ffd700 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6),
+                        0 0 20px rgba(255, 160, 122, 0.4);
+            transition: all 0.4s ease;
+            z-index: 1001;
+            letter-spacing: 0.5px;
+            display: none;
         }
-
-        .current-time {
-            text-align: center;
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 20px;
+        
+        .cake-button.show {
+            display: block;
+            animation: zoomIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .cake-button:hover {
+            background: linear-gradient(135deg, #ff8ab4 0%, #ffb89a 50%, #ffe066 100%);
+            box-shadow: 0 8px 35px rgba(255, 138, 180, 0.9),
+                        0 0 50px rgba(255, 184, 154, 0.7),
+                        inset 0 0 30px rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, calc(-50% + 200px)) scale(1.05);
+        }
+        
+        .cake-button:active {
+            transform: translate(-50%, calc(-50% + 200px)) scale(0.98);
+        }
+        
+        .gift-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-50% + 280px));
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #9b59b6 0%, #e74c3c 50%, #f39c12 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.6),
+                        0 0 20px rgba(231, 76, 60, 0.4);
+            transition: all 0.4s ease;
+            z-index: 1001;
+            letter-spacing: 0.5px;
+            display: none;
+        }
+        
+        .gift-button.show {
+            display: block;
+            animation: zoomIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .gift-button:hover {
+            background: linear-gradient(135deg, #b57bdb 0%, #f16757 50%, #f5b041 100%);
+            box-shadow: 0 8px 35px rgba(181, 123, 219, 0.9),
+                        0 0 50px rgba(241, 103, 87, 0.7),
+                        inset 0 0 30px rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, calc(-50% + 280px)) scale(1.05);
+        }
+        
+        .gift-button:active {
+            transform: translate(-50%, calc(-50% + 280px)) scale(0.98);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>⏰ Day Progress Tracker</h1>
-        
-        <div class="input-group">
-            <label for="wakeTime">Wake Time</label>
-            <input type="time" id="wakeTime" value="08:00">
-        </div>
-
-        <div class="input-group">
-            <label for="sleepTime">Sleep Time</label>
-            <input type="time" id="sleepTime" value="00:00">
-        </div>
-
-        <div class="time-legend">
-            <div class="legend-item">
-                <div class="legend-dot wake"></div>
-                <span>Wake: </span>
-                <input type="time" class="legend-time-input" id="wakeTimeInput" value="08:00">
-            </div>
-            <div class="legend-item">
-                <div class="legend-dot sleep"></div>
-                <span>Sleep: </span>
-                <input type="time" class="legend-time-input" id="sleepTimeInput" value="00:00">
-            </div>
-        </div>
-
-        <div class="current-time" id="currentTime">Current time: --:--</div>
-
-        <div class="progress-container">
-            <div class="clock-container">
-                <svg class="clock-svg" viewBox="0 0 350 350">
-                    <defs>
-                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <circle class="outer-circle" cx="175" cy="175" r="165"></circle>
-                    <circle class="clock-circle-bg" cx="175" cy="175" r="130"></circle>
-                    <circle id="progressCircle" class="clock-circle-progress" cx="175" cy="175" r="130"></circle>
-                </svg>
-                <div class="clock-markers" id="clockMarkers"></div>
-                <div class="wake-handle time-handle" id="wakeHandle">
-                    <div class="handle-label">Wake</div>
-                </div>
-                <div class="sleep-handle time-handle" id="sleepHandle">
-                    <div class="handle-label">Sleep</div>
-                </div>
-                <div class="clock-center">
-                    <div class="clock-percentage" id="clockPercentage">0%</div>
-                    <div class="clock-label">Day Complete</div>
-                    <div class="clock-remaining" id="clockRemaining">100%</div>
-                    <div class="clock-label" style="margin-top: 4px;">Remaining</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-label">Time Elapsed</div>
-                <div class="stat-value" id="elapsed">--</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Time Remaining</div>
-                <div class="stat-value" id="remaining">--</div>
-            </div>
-        </div>
+    <canvas id="canvas"></canvas>
+    
+    <button class="test-button" onclick="showSuccess()">
+        Click here to make sure your man made a working product 😉
+    </button>
+    
+    <div class="success-message" id="successMessage">
+        Product is working 👍
     </div>
-
+    
+    <div class="success-message" id="aratiMessage">
+        But, Aarati first!!
+    </div>
+    
+    <img src="Puja_Thali.png" alt="Puja Thali" class="puja-thali" id="pujaThali">
+    
+    <button class="cake-button" id="cakeButton" onclick="window.open('https://bdaycake.com/dhurmu_3523?invitation_code=SDCP', '_blank')">
+        Let's cut cake now 🎂
+    </button>
+    
+    <button class="gift-button" id="giftButton" onclick="window.open('https://gifft.me/o/d/7vtas13g03leipaig5pwya5t', '_blank')">
+        Gift time 🎁
+    </button>
+    
+    <audio id="fireworksSound" loop preload="auto">
+        <source src="fireworks.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="aartiSound" preload="auto">
+        <source src="Om_Jai_Jagdish_Hare_8.mp3" type="audio/mpeg">
+    </audio>
+    
     <script>
-        let wakeMinutes = 8 * 60; // 8:00 AM
-        let sleepMinutes = 0; // 12:00 AM (midnight)
-
-        function minutesToTime(minutes) {
-            const h = Math.floor(minutes / 60) % 24;
-            const m = minutes % 60;
-            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-        }
-
-        function formatTime12Hour(minutes) {
-            let h = Math.floor(minutes / 60) % 24;
-            const m = minutes % 60;
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            h = h % 12 || 12;
-            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${ampm}`;
-        }
-
-        function formatHours(minutes) {
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            if (hours === 0) {
-                return `${mins}m`;
+        // Start playing fireworks sound when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('fireworksSound');
+            audio.volume = 0.5;
+            
+            // Try to play audio on page load
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log("Fireworks audio playing successfully!");
+                    })
+                    .catch(error => {
+                        console.log("Autoplay prevented. Will play on button click:", error);
+                    });
             }
-            return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-        }
-
-        function formatTime(date) {
-            return date.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: true 
-            });
-        }
-
-        function createTimeMarkers() {
-            const markersContainer = document.getElementById('clockMarkers');
-            markersContainer.innerHTML = '';
-            
-            const centerX = 175;
-            const centerY = 175;
-            const radius = 165;
-            
-            for (let i = 0; i < 24; i++) {
-                const angle = (i * 15) * (Math.PI / 180) - Math.PI / 2;
-                const x = centerX + radius * Math.cos(angle);
-                const y = centerY + radius * Math.sin(angle);
-                
-                const marker = document.createElement('div');
-                marker.className = 'time-marker';
-                marker.style.left = `${x}px`;
-                marker.style.top = `${y}px`;
-                
-                // Show hour labels for every 3 hours
-                if (i % 3 === 0) {
-                    const hour = i;
-                    marker.textContent = hour === 0 ? '12a' : hour < 12 ? `${hour}a` : hour === 12 ? '12p' : `${hour-12}p`;
-                }
-                
-                markersContainer.appendChild(marker);
-            }
-        }
-
-        function angleToMinutes(angle) {
-            // Convert angle (0-360) to minutes (0-1439)
-            let minutes = Math.round((angle / 360) * 24 * 60);
-            minutes = ((minutes % (24 * 60)) + (24 * 60)) % (24 * 60); // Normalize to 0-1439
-            return minutes;
-        }
-
-        function minutesToAngle(minutes) {
-            // Convert minutes (0-1439) to angle (0-360)
-            return (minutes / (24 * 60)) * 360;
-        }
-
-        function updateHandlePosition(handle, minutes) {
-            const centerX = 175;
-            const centerY = 175;
-            const radius = 165;
-            const angle = (minutesToAngle(minutes) * Math.PI / 180) - Math.PI / 2;
-            
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
-            
-            handle.style.left = `${x}px`;
-            handle.style.top = `${y}px`;
-        }
-
-        function setupDraggable(handle, isWake) {
-            let isDragging = false;
-            
-            const onMove = (e) => {
-                if (!isDragging) return;
-                
-                const rect = handle.parentElement.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                
-                const dx = clientX - centerX;
-                const dy = clientY - centerY;
-                
-                let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
-                if (angle < 0) angle += 360;
-                
-                const minutes = angleToMinutes(angle);
-                
-                if (isWake) {
-                    wakeMinutes = minutes;
-                } else {
-                    sleepMinutes = minutes;
-                }
-                
-                updateDisplay();
-            };
-            
-            const onEnd = () => {
-                isDragging = false;
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup', onEnd);
-                document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('touchend', onEnd);
-            };
-            
-            const onStart = (e) => {
-                isDragging = true;
-                e.preventDefault();
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onEnd);
-                document.addEventListener('touchmove', onMove);
-                document.addEventListener('touchend', onEnd);
-            };
-            
-            handle.addEventListener('mousedown', onStart);
-            handle.addEventListener('touchstart', onStart);
-        }
-
-        function calculateProgress() {
-            const now = new Date();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-            
-            let totalWakingMinutes = sleepMinutes - wakeMinutes;
-            if (totalWakingMinutes <= 0) {
-                totalWakingMinutes += 24 * 60;
-            }
-            
-            let elapsed;
-            if (sleepMinutes > wakeMinutes) {
-                // Normal day (wake and sleep on same calendar day)
-                if (currentMinutes >= wakeMinutes && currentMinutes < sleepMinutes) {
-                    elapsed = currentMinutes - wakeMinutes;
-                } else if (currentMinutes >= sleepMinutes) {
-                    elapsed = totalWakingMinutes; // After sleep time
-                } else {
-                    elapsed = 0; // Before wake time
-                }
-            } else {
-                // Crosses midnight
-                if (currentMinutes >= wakeMinutes) {
-                    elapsed = currentMinutes - wakeMinutes;
-                } else if (currentMinutes < sleepMinutes) {
-                    elapsed = (24 * 60 - wakeMinutes) + currentMinutes;
-                } else {
-                    elapsed = totalWakingMinutes; // After sleep time
-                }
-            }
-            
-            if (elapsed > totalWakingMinutes) {
-                elapsed = totalWakingMinutes;
-            }
-            
-            const percentage = Math.min((elapsed / totalWakingMinutes) * 100, 100);
-            const remaining = Math.max(totalWakingMinutes - elapsed, 0);
-            
-            // Update circular progress
-            const circle = document.getElementById('progressCircle');
-            const radius = 130;
-            const circumference = 2 * Math.PI * radius;
-            const offset = circumference - (percentage / 100) * circumference;
-            
-            circle.style.strokeDasharray = `${circumference} ${circumference}`;
-            circle.style.strokeDashoffset = offset;
-            
-            // Update displays
-            document.getElementById('currentTime').textContent = `Current time: ${formatTime(now)}`;
-            document.getElementById('clockPercentage').textContent = `${percentage.toFixed(1)}%`;
-            const remainingPercent = Math.max(100 - percentage, 0);
-            document.getElementById('clockRemaining').textContent = `${remainingPercent.toFixed(1)}%`;
-            document.getElementById('elapsed').textContent = formatHours(elapsed);
-            document.getElementById('remaining').textContent = formatHours(remaining);
-        }
-
-        function timeInputToMinutes(timeInput) {
-            // time input format is "HH:MM" in 24-hour format
-            const [hours, minutes] = timeInput.split(':').map(Number);
-            return hours * 60 + minutes;
-        }
-
-        function minutesToTimeInput(minutes) {
-            // Convert minutes to "HH:MM" format for time input
-            const h = Math.floor(minutes / 60) % 24;
-            const m = minutes % 60;
-            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-        }
-
-        function updateDisplay() {
-            // Update time inputs
-            document.getElementById('wakeTimeInput').value = minutesToTimeInput(wakeMinutes);
-            document.getElementById('sleepTimeInput').value = minutesToTimeInput(sleepMinutes);
-            
-            // Update handle positions
-            updateHandlePosition(document.getElementById('wakeHandle'), wakeMinutes);
-            updateHandlePosition(document.getElementById('sleepHandle'), sleepMinutes);
-            
-            calculateProgress();
-        }
-
-        function setupTimeInputs() {
-            const wakeInput = document.getElementById('wakeTimeInput');
-            const sleepInput = document.getElementById('sleepTimeInput');
-            
-            wakeInput.addEventListener('change', function() {
-                wakeMinutes = timeInputToMinutes(this.value);
-                updateDisplay();
-            });
-            
-            sleepInput.addEventListener('change', function() {
-                sleepMinutes = timeInputToMinutes(this.value);
-                updateDisplay();
-            });
-        }
-
-        // Initialize
-        createTimeMarkers();
-        setupDraggable(document.getElementById('wakeHandle'), true);
-        setupDraggable(document.getElementById('sleepHandle'), false);
-        setupTimeInputs();
-        updateDisplay();
+        });
         
-        // Update every second
-        setInterval(calculateProgress, 1000);
+        function showSuccess() {
+            // Remove the button
+            const button = document.querySelector('.test-button');
+            button.style.display = 'none';
+            
+            // Ensure audio is playing (in case autoplay was blocked)
+            const audio = document.getElementById('fireworksSound');
+            if (audio.paused) {
+                audio.play().catch(e => console.log("Audio play failed:", e));
+            }
+            
+            // Show the success message
+            const message = document.getElementById('successMessage');
+            message.classList.add('show');
+            
+            // After 2 seconds, hide first message and show the Arati message
+            setTimeout(() => {
+                const aratiMsg = document.getElementById('aratiMessage');
+                message.classList.remove('show');
+                message.style.display = 'none';
+                aratiMsg.classList.add('show');
+                
+                // After 2 more seconds, hide Arati message and show Puja Thali
+                setTimeout(() => {
+                    aratiMsg.classList.remove('show');
+                    aratiMsg.style.display = 'none';
+                    
+                    const pujaThali = document.getElementById('pujaThali');
+                    pujaThali.classList.add('show');
+                    
+                    // After zoom animation completes, start circular motion for 15 seconds
+                    setTimeout(() => {
+                        pujaThali.classList.remove('show');
+                        pujaThali.classList.add('rotate');
+                        
+                        // Start playing Aarti sound
+                        const aartiAudio = document.getElementById('aartiSound');
+                        aartiAudio.volume = 0.7;
+                        aartiAudio.currentTime = 0;
+                        aartiAudio.play().catch(e => console.log("Aarti audio play failed:", e));
+                        
+                        // After 15 seconds, stop the aarti audio, align puja thali, and show buttons
+                        setTimeout(() => {
+                            aartiAudio.pause();
+                            aartiAudio.currentTime = 0;
+                            
+                            // Move Puja Thali to aligned position
+                            pujaThali.classList.remove('rotate');
+                            pujaThali.classList.add('aligned');
+                            
+                            // Show the cake button
+                            const cakeButton = document.getElementById('cakeButton');
+                            cakeButton.classList.add('show');
+                            
+                            // Show the gift button
+                            const giftButton = document.getElementById('giftButton');
+                            giftButton.classList.add('show');
+                        }, 15000);
+                        
+                    }, 1000); // Wait for zoom animation to complete
+                }, 2000);
+            }, 2000);
+        }
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const rockets = [];
+        const particles = [];
+        
+        class Rocket {
+            constructor(x) {
+                this.x = x;
+                this.y = canvas.height;
+                this.velocityY = -(Math.random() * 3 + 10);
+                this.velocityX = (Math.random() - 0.5) * 2;
+                this.hue = Math.random() * 30 + 45;
+                this.exploded = false;
+                this.trail = [];
+                this.maxTrailLength = 15;
+                this.targetY = canvas.height * (Math.random() * 0.2 + 0.2);
+            }
+            
+            update() {
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > this.maxTrailLength) {
+                    this.trail.shift();
+                }
+                
+                this.velocityY += 0.15;
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                
+                if (this.velocityY >= 0 || this.y <= this.targetY) {
+                    this.explode();
+                }
+            }
+            
+            draw() {
+                ctx.save();
+                
+                for (let i = 0; i < this.trail.length; i++) {
+                    const point = this.trail[i];
+                    const alpha = i / this.trail.length;
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+                    ctx.fill();
+                    
+                    ctx.globalAlpha = alpha * 0.3;
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsl(${this.hue}, 100%, 80%)`;
+                    ctx.fill();
+                }
+                
+                ctx.globalAlpha = 1;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 90%)`;
+                ctx.fill();
+                
+                ctx.restore();
+            }
+            
+            explode() {
+                this.exploded = true;
+                const particleCount = Math.random() * 50 + 100;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle(this.x, this.y, this.hue));
+                }
+            }
+        }
+        
+        class Particle {
+            constructor(x, y, hue) {
+                this.x = x;
+                this.y = y;
+                this.hue = hue + (Math.random() * 40 - 20);
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 8 + 2;
+                this.velocityX = Math.cos(angle) * velocity;
+                this.velocityY = Math.sin(angle) * velocity;
+                this.life = 1;
+                this.decay = Math.random() * 0.015 + 0.008;
+                this.size = Math.random() * 3 + 1.5;
+                this.resistance = 0.96;
+                this.gravity = 0.12;
+                this.trail = [];
+                this.maxTrailLength = 8;
+            }
+            
+            update() {
+                if (this.life > 0.7) {
+                    this.trail.push({ x: this.x, y: this.y });
+                    if (this.trail.length > this.maxTrailLength) {
+                        this.trail.shift();
+                    }
+                }
+                
+                this.velocityX *= this.resistance;
+                this.velocityY *= this.resistance;
+                this.velocityY += this.gravity;
+                
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                this.life -= this.decay;
+            }
+            
+            draw() {
+                ctx.save();
+                
+                for (let i = 0; i < this.trail.length; i++) {
+                    const point = this.trail[i];
+                    const alpha = (i / this.trail.length) * this.life;
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, this.size * 0.5, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsl(${this.hue}, 100%, 75%)`;
+                    ctx.fill();
+                }
+                
+                ctx.globalAlpha = this.life;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 75%)`;
+                ctx.fill();
+                
+                ctx.globalAlpha = this.life * 0.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 85%)`;
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+        
+        function launchRocket() {
+            const x = Math.random() * (canvas.width - 200) + 100;
+            rockets.push(new Rocket(x));
+        }
+        
+        function scheduleNextRocket() {
+            const delay = Math.random() * 267 + 200;
+            setTimeout(() => {
+                launchRocket();
+                scheduleNextRocket();
+            }, delay);
+        }
+        
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = rockets.length - 1; i >= 0; i--) {
+                if (!rockets[i].exploded) {
+                    rockets[i].update();
+                    rockets[i].draw();
+                } else {
+                    rockets.splice(i, 1);
+                }
+            }
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        animate();
+        
+        setTimeout(() => launchRocket(), 500);
+        setTimeout(() => launchRocket(), 1000);
+        setTimeout(() => launchRocket(), 1500);
+        setTimeout(() => launchRocket(), 800);
+        setTimeout(() => launchRocket(), 1100);
+        setTimeout(() => launchRocket(), 1300);
+        setTimeout(() => launchRocket(), 1700);
+        setTimeout(() => launchRocket(), 1900);
+        setTimeout(() => launchRocket(), 2100);
+        
+        scheduleNextRocket();
     </script>
 </body>
 </html>
