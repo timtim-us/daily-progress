@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! 🎆</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        canvas {
+            display: block;
+            background: #000;
+        }
+        
+        .test-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #4a9ff5 50%, #00d4ff 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6),
+                        0 0 20px rgba(74, 159, 245, 0.4);
+            transition: all 0.4s ease;
+            z-index: 1000;
+            letter-spacing: 0.5px;
+        }
+        
+        .test-button:hover {
+            background: linear-gradient(135deg, #8a9fff 0%, #6fc5ff 50%, #3df5ff 100%);
+            box-shadow: 0 8px 35px rgba(138, 159, 255, 0.9),
+                        0 0 50px rgba(111, 197, 255, 0.7),
+                        inset 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+        
+        .test-button:active {
+            transform: translate(-50%, -50%) scale(0.98);
+        }
+        
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            z-index: 1000;
+            text-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.6),
+                0 0 30px rgba(255, 255, 255, 0.4),
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                0 8px 16px rgba(0, 0, 0, 0.6);
+            display: none;
+        }
+        
+        .success-message.show {
+            display: block;
+            animation: zoomIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        .puja-thali {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: auto;
+            z-index: 1000;
+            display: none;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8))
+                    drop-shadow(0 0 50px rgba(255, 165, 0, 0.6));
+        }
+        
+        .puja-thali.show {
+            display: block;
+            animation: zoomInImage 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .puja-thali.rotate {
+            display: block;
+            animation: circularMotion 15s linear forwards;
+        }
+        
+        .puja-thali.aligned {
+            display: block;
+            transform: translate(-50%, calc(-50% - 100px));
+            animation: moveToTop 0.5s ease-out forwards;
+        }
+        
+        @keyframes moveToTop {
+            from {
+                transform: translate(-50%, -50%);
+            }
+            to {
+                transform: translate(-50%, calc(-50% - 100px));
+            }
+        }
+        
+        @keyframes zoomInImage {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        @keyframes circularMotion {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg) translateX(150px) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(1080deg) translateX(150px) rotate(-1080deg);
+            }
+        }
+        
+        .cake-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-50% + 200px));
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffa07a 50%, #ffd700 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6),
+                        0 0 20px rgba(255, 160, 122, 0.4);
+            transition: all 0.4s ease;
+            z-index: 1001;
+            letter-spacing: 0.5px;
+            display: none;
+        }
+        
+        .cake-button.show {
+            display: block;
+            animation: zoomIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .cake-button:hover {
+            background: linear-gradient(135deg, #ff8ab4 0%, #ffb89a 50%, #ffe066 100%);
+            box-shadow: 0 8px 35px rgba(255, 138, 180, 0.9),
+                        0 0 50px rgba(255, 184, 154, 0.7),
+                        inset 0 0 30px rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, calc(-50% + 200px)) scale(1.05);
+        }
+        
+        .cake-button:active {
+            transform: translate(-50%, calc(-50% + 200px)) scale(0.98);
+        }
+        
+        .gift-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-50% + 280px));
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #9b59b6 0%, #e74c3c 50%, #f39c12 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.6),
+                        0 0 20px rgba(231, 76, 60, 0.4);
+            transition: all 0.4s ease;
+            z-index: 1001;
+            letter-spacing: 0.5px;
+            display: none;
+        }
+        
+        .gift-button.show {
+            display: block;
+            animation: zoomIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .gift-button:hover {
+            background: linear-gradient(135deg, #b57bdb 0%, #f16757 50%, #f5b041 100%);
+            box-shadow: 0 8px 35px rgba(181, 123, 219, 0.9),
+                        0 0 50px rgba(241, 103, 87, 0.7),
+                        inset 0 0 30px rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, calc(-50% + 280px)) scale(1.05);
+        }
+        
+        .gift-button:active {
+            transform: translate(-50%, calc(-50% + 280px)) scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <button class="test-button" onclick="showSuccess()">
+        Click here to make sure your man made a working product 😉
+    </button>
+    
+    <div class="success-message" id="successMessage">
+        Product is working 👍
+    </div>
+    
+    <div class="success-message" id="aratiMessage">
+        But, Aarati first!!
+    </div>
+    
+    <img src="Puja_Thali.png" alt="Puja Thali" class="puja-thali" id="pujaThali">
+    
+    <button class="cake-button" id="cakeButton" onclick="window.open('https://bdaycake.com/dhurmu_3523?invitation_code=SDCP', '_blank')">
+        Let's cut cake now 🎂
+    </button>
+    
+    <button class="gift-button" id="giftButton" onclick="window.open('https://gifft.me/o/d/7vtas13g03leipaig5pwya5t', '_blank')">
+        Gift time 🎁
+    </button>
+    
+    <audio id="fireworksSound" loop preload="auto">
+        <source src="fireworks.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="aartiSound" preload="auto">
+        <source src="Om_Jai_Jagdish_Hare_8.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // Start playing fireworks sound when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('fireworksSound');
+            audio.volume = 0.5;
+            
+            // Try to play audio on page load
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log("Fireworks audio playing successfully!");
+                    })
+                    .catch(error => {
+                        console.log("Autoplay prevented. Will play on button click:", error);
+                    });
+            }
+        });
+        
+        function showSuccess() {
+            // Remove the button
+            const button = document.querySelector('.test-button');
+            button.style.display = 'none';
+            
+            // Ensure audio is playing (in case autoplay was blocked)
+            const audio = document.getElementById('fireworksSound');
+            if (audio.paused) {
+                audio.play().catch(e => console.log("Audio play failed:", e));
+            }
+            
+            // Show the success message
+            const message = document.getElementById('successMessage');
+            message.classList.add('show');
+            
+            // After 2 seconds, hide first message and show the Arati message
+            setTimeout(() => {
+                const aratiMsg = document.getElementById('aratiMessage');
+                message.classList.remove('show');
+                message.style.display = 'none';
+                aratiMsg.classList.add('show');
+                
+                // After 2 more seconds, hide Arati message and show Puja Thali
+                setTimeout(() => {
+                    aratiMsg.classList.remove('show');
+                    aratiMsg.style.display = 'none';
+                    
+                    const pujaThali = document.getElementById('pujaThali');
+                    pujaThali.classList.add('show');
+                    
+                    // After zoom animation completes, start circular motion for 15 seconds
+                    setTimeout(() => {
+                        pujaThali.classList.remove('show');
+                        pujaThali.classList.add('rotate');
+                        
+                        // Start playing Aarti sound
+                        const aartiAudio = document.getElementById('aartiSound');
+                        aartiAudio.volume = 0.7;
+                        aartiAudio.currentTime = 0;
+                        aartiAudio.play().catch(e => console.log("Aarti audio play failed:", e));
+                        
+                        // After 15 seconds, stop the aarti audio, align puja thali, and show buttons
+                        setTimeout(() => {
+                            aartiAudio.pause();
+                            aartiAudio.currentTime = 0;
+                            
+                            // Move Puja Thali to aligned position
+                            pujaThali.classList.remove('rotate');
+                            pujaThali.classList.add('aligned');
+                            
+                            // Show the cake button
+                            const cakeButton = document.getElementById('cakeButton');
+                            cakeButton.classList.add('show');
+                            
+                            // Show the gift button
+                            const giftButton = document.getElementById('giftButton');
+                            giftButton.classList.add('show');
+                        }, 15000);
+                        
+                    }, 1000); // Wait for zoom animation to complete
+                }, 2000);
+            }, 2000);
+        }
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const rockets = [];
+        const particles = [];
+        
+        class Rocket {
+            constructor(x) {
+                this.x = x;
+                this.y = canvas.height;
+                this.velocityY = -(Math.random() * 3 + 10);
+                this.velocityX = (Math.random() - 0.5) * 2;
+                this.hue = Math.random() * 30 + 45;
+                this.exploded = false;
+                this.trail = [];
+                this.maxTrailLength = 15;
+                this.targetY = canvas.height * (Math.random() * 0.2 + 0.2);
+            }
+            
+            update() {
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > this.maxTrailLength) {
+                    this.trail.shift();
+                }
+                
+                this.velocityY += 0.15;
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                
+                if (this.velocityY >= 0 || this.y <= this.targetY) {
+                    this.explode();
+                }
+            }
+            
+            draw() {
+                ctx.save();
+                
+                for (let i = 0; i < this.trail.length; i++) {
+                    const point = this.trail[i];
+                    const alpha = i / this.trail.length;
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+                    ctx.fill();
+                    
+                    ctx.globalAlpha = alpha * 0.3;
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsl(${this.hue}, 100%, 80%)`;
+                    ctx.fill();
+                }
+                
+                ctx.globalAlpha = 1;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 90%)`;
+                ctx.fill();
+                
+                ctx.restore();
+            }
+            
+            explode() {
+                this.exploded = true;
+                const particleCount = Math.random() * 50 + 100;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle(this.x, this.y, this.hue));
+                }
+            }
+        }
+        
+        class Particle {
+            constructor(x, y, hue) {
+                this.x = x;
+                this.y = y;
+                this.hue = hue + (Math.random() * 40 - 20);
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 8 + 2;
+                this.velocityX = Math.cos(angle) * velocity;
+                this.velocityY = Math.sin(angle) * velocity;
+                this.life = 1;
+                this.decay = Math.random() * 0.015 + 0.008;
+                this.size = Math.random() * 3 + 1.5;
+                this.resistance = 0.96;
+                this.gravity = 0.12;
+                this.trail = [];
+                this.maxTrailLength = 8;
+            }
+            
+            update() {
+                if (this.life > 0.7) {
+                    this.trail.push({ x: this.x, y: this.y });
+                    if (this.trail.length > this.maxTrailLength) {
+                        this.trail.shift();
+                    }
+                }
+                
+                this.velocityX *= this.resistance;
+                this.velocityY *= this.resistance;
+                this.velocityY += this.gravity;
+                
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                this.life -= this.decay;
+            }
+            
+            draw() {
+                ctx.save();
+                
+                for (let i = 0; i < this.trail.length; i++) {
+                    const point = this.trail[i];
+                    const alpha = (i / this.trail.length) * this.life;
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, this.size * 0.5, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsl(${this.hue}, 100%, 75%)`;
+                    ctx.fill();
+                }
+                
+                ctx.globalAlpha = this.life;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 75%)`;
+                ctx.fill();
+                
+                ctx.globalAlpha = this.life * 0.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 85%)`;
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+        
+        function launchRocket() {
+            const x = Math.random() * (canvas.width - 200) + 100;
+            rockets.push(new Rocket(x));
+        }
+        
+        function scheduleNextRocket() {
+            const delay = Math.random() * 267 + 200;
+            setTimeout(() => {
+                launchRocket();
+                scheduleNextRocket();
+            }, delay);
+        }
+        
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = rockets.length - 1; i >= 0; i--) {
+                if (!rockets[i].exploded) {
+                    rockets[i].update();
+                    rockets[i].draw();
+                } else {
+                    rockets.splice(i, 1);
+                }
+            }
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        animate();
+        
+        setTimeout(() => launchRocket(), 500);
+        setTimeout(() => launchRocket(), 1000);
+        setTimeout(() => launchRocket(), 1500);
+        setTimeout(() => launchRocket(), 800);
+        setTimeout(() => launchRocket(), 1100);
+        setTimeout(() => launchRocket(), 1300);
+        setTimeout(() => launchRocket(), 1700);
+        setTimeout(() => launchRocket(), 1900);
+        setTimeout(() => launchRocket(), 2100);
+        
+        scheduleNextRocket();
+    </script>
+</body>
+</html>
